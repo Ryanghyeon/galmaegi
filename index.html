@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>갈매기 가든 예약</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      background-image: url('./images/background.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #2d2d2d;
+    }
+    header {
+      background: rgba(255,255,255,0.85);
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      margin: 0;
+      color: #207744;
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      background: rgba(255,255,255,0.9);
+      padding: 20px;
+      border-radius: 12px;
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+    }
+    input {
+      padding: 8px;
+      width: 100%;
+      margin-top: 4px;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 10px 20px;
+      background: #207744;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .menu {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .menu-item {
+      background: #f2f2f2;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .menu-item img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+      background: rgba(255,255,255,0.85);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>갈매기 가든 예약</h1>
+    <p>전북 완주군 운주면 금고당로 366</p>
+  </header>
+  <div class="container">
+    <h2>예약하기</h2>
+    <label for="name">이름</label>
+    <input type="text" id="name" placeholder="예약자 이름" />
+    <label for="phone">연락처</label>
+    <input type="text" id="phone" placeholder="010-0000-0000" />
+    <label for="date">날짜</label>
+    <input type="date" id="date" />
+    <button onclick="alert('예약이 접수되었습니다!')">예약 완료</button>
+
+    <h2>📋 메뉴 안내</h2>
+    <div class="menu">
+      <div class="menu-item">
+        <img src="./images/dakbaeksuk.jpg" alt="닭백숙" />
+        <p>닭백숙 - 7만원</p>
+      </div>
+      <div class="menu-item">
+        <img src="./images/daktoritang.jpg" alt="닭도리탕" />
+        <p>닭도리탕 - 7만원</p>
+      </div>
+      <div class="menu-item">
+        <img src="./images/otdak.jpg" alt="옻닭" />
+        <p>옻닭 - 7만5천원</p>
+      </div>
+      <div class="menu-item">
+        <img src="./images/mukunji.jpg" alt="묵은지 닭도리탕" />
+        <p>묵은지 닭도리탕 - 7만5천원</p>
+      </div>
+      <div class="menu-item">
+        <img src="./images/samgyeopsal.jpg" alt="삼겹살" />
+        <p>삼겹살 (200g) - 2만원</p>
+      </div>
+    </div>
+  </div>
+  <footer>
+    갈매기 가든 &copy; 2025. All rights reserved.
+  </footer>
+</body>
+</html>
