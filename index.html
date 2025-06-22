@@ -92,7 +92,7 @@ const firebaseConfig = {
 <body>
   <header>
     <h1>갈매기 가든 예약</h1>
-    <p>전북 완주군 운주면 금고당로 366</p>
+    <p>전북 완주군 운주면 366</p>
   </header>
   <div class="container">
     <h2>예약하기</h2>
@@ -103,7 +103,8 @@ const firebaseConfig = {
     <label for="date">날짜</label>
     <input type="date" id="date" />
     <button onclick="alert('예약이 접수되었습니다!')">예약 완료
-    <script>
+    </button>
+      <script>
   const reserveBtn = document.querySelector("button");
   reserveBtn.addEventListener("click", async () => {
     const name = document.getElementById("name").value;
@@ -126,7 +127,6 @@ const firebaseConfig = {
     }
   });
 </script>
-    </button>
 
 
     <h2>📋 메뉴 안내</h2>
