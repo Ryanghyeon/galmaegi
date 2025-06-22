@@ -4,8 +4,7 @@
 <head>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
-<script>
+  <script>
 const firebaseConfig = {
   apiKey: "API_KEY",
   authDomain: "PROJECT_ID.firebaseapp.com",
@@ -102,7 +101,7 @@ const firebaseConfig = {
     <input type="text" id="phone" placeholder="010-0000-0000" />
     <label for="date">날짜</label>
     <input type="date" id="date" />
-    <button onclick="alert('예약이 접수되었습니다!')">예약 완료</button>
+    <button onclick="alert('예약이 접수되었습니다!')">예약 완료
     <script>
   const reserveBtn = document.querySelector("button");
   reserveBtn.addEventListener("click", async () => {
@@ -115,17 +114,19 @@ const firebaseConfig = {
       return;
     }
 
-    await db.collection("reservations").add({
-      name, phone, date, timestamp: new Date()
-    });
-
-    alert("예약이 접수되었습니다!");
-    document.getElementById("name").value = "";
-    document.getElementById("phone").value = "";
-    document.getElementById("date").value = "";
+    try {
+      await db.collection("reservations").add({
+        name, phone, date, timestamp: new Date()
+      });
+      alert("예약이 접수되었습니다!");
+    } catch (error) {
+      console.error("예약 저장 실패:", error);
+      alert("예약 저장 중 오류가 발생했습니다.");
+    }
   });
 </script>
-    
+    </button>
+
 
     <h2>📋 메뉴 안내</h2>
     <div class="menu">
