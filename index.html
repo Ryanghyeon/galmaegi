@@ -2,6 +2,21 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "복사한 키",
+    authDomain: "....",
+    projectId: "...",
+    storageBucket: "...",
+    messagingSenderId: "...",
+    appId: "..."
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>갈매기 가든 예약</title>
@@ -88,6 +103,29 @@
     <label for="date">날짜</label>
     <input type="date" id="date" />
     <button onclick="alert('예약이 접수되었습니다!')">예약 완료</button>
+    <script>
+  const reserveBtn = document.querySelector("button");
+  reserveBtn.addEventListener("click", async () => {
+    const name = document.getElementById("name").value;
+    const phone = document.getElementById("phone").value;
+    const date = document.getElementById("date").value;
+
+    if (!name || !phone || !date) {
+      alert("모든 값을 입력해주세요.");
+      return;
+    }
+
+    await db.collection("reservations").add({
+      name, phone, date, timestamp: new Date()
+    });
+
+    alert("예약이 접수되었습니다!");
+    document.getElementById("name").value = "";
+    document.getElementById("phone").value = "";
+    document.getElementById("date").value = "";
+  });
+</script>
+    
 
     <h2>📋 메뉴 안내</h2>
     <div class="menu">
