@@ -3,63 +3,99 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>갈매기 가든 관리자</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDd7YxnP6TZi9nKKUwGsKxis8YbtnaOd00",
+      authDomain: "galmaegi-98b99.firebaseapp.com",
+      projectId: "galmaegi-98b99",
+      storageBucket: "galmaegi-98b99.firebasestorage.app",
+      messagingSenderId: "737602697863",
+      appId: "1:737602697863:web:1f38158b28ddfe92d8d622",
+      measurementId: "G-XRVV6BDCYN"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
   <style>
     body {
-      font-family: sans-serif;
-      background: #f5f5f5;
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 20px;
+      background: #f8f9fa;
     }
     h1 {
       text-align: center;
       color: #207744;
     }
-    .admin-box {
+    .reservation {
       background: white;
-      padding: 20px;
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin: 10px auto;
       max-width: 600px;
-      margin: 0 auto;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 10px;
+    }
+    .reservation p {
+      margin: 5px 0;
+    }
+    .confirm-button {
+      background: #207744;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      margin-top: 10px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .confirmed {
+      color: green;
+      font-weight: bold;
+    }
+    .waiting {
+      color: red;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>관리자 예약 확인</h1>
-  <div class="admin-box">
-    <p>Firebase와 연동된 예약 내역이 여기에 표시됩니다.</p>
-    <p>예: 이름, 날짜, 연락처 리스트</p>
-  </div>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  
-  
+  <h1>예약 관리 (갈매기 가든)</h1>
+  <div id="reservations"></div>
+
   <script>
-  const firebaseConfig = {
-  apiKey: "AIzaSyDd7YxnP6TZi9nKKUwGsKxis8YbtnaOd00",
-  authDomain: "galmaegi-98b99.firebaseapp.com",
-  projectId: "galmaegi-98b99",
-  storageBucket: "galmaegi-98b99.firebasestorage.app",
-  messagingSenderId: "737602697863",
-  appId: "1:737602697863:web:1f38158b28ddfe92d8d622",
-  measurementId: "G-XRVV6BDCYN"
-}; firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
+    const renderReservations = async () => {
+      const container = document.getElementById('reservations');
+      container.innerHTML = '';
+      const snapshot = await db.collection("reservations").orderBy("timestamp", "desc").get();
 
-  db.collection("reservations")
-    .orderBy("timestamp", "desc")
-    .onSnapshot(snapshot => {
-      const box = document.querySelector(".admin-box");
-      box.innerHTML = "<h3>예약 내역</h3>";
-      snapshot.forEach(doc => {
-        const r = doc.data();
-        box.innerHTML += `<p>📅 ${r.date} - ${r.name} (${r.phone})</p>`;
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const div = document.createElement('div');
+        div.className = 'reservation';
+
+        div.innerHTML = `
+          <p><strong>이름:</strong> ${data.name}</p>
+          <p><strong>연락처:</strong> ${data.phone}</p>
+          <p><strong>날짜:</strong> ${data.date}</p>
+          <p><strong>구역:</strong> ${data.area || '미지정'}</p>
+          <p><strong>금액:</strong> ${data.price ? data.price.toLocaleString() + '원' : '미지정'}</p>
+          <p><strong>상태:</strong> <span class="${data.status === '확정' ? 'confirmed' : 'waiting'}">${data.status}</span></p>
+          ${data.status !== '확정' ? `<button class="confirm-button" onclick="confirmReservation('${doc.id}')">예약 확정</button>` : ''}
+        `;
+
+        container.appendChild(div);
       });
-    });
-</script>
+    };
 
+    async function confirmReservation(docId) {
+      await db.collection("reservations").doc(docId).update({ status: "확정" });
+      alert("예약이 확정되었습니다!");
+      renderReservations();
+    }
 
+    window.onload = renderReservations;
+  </script>
 </body>
 </html>
