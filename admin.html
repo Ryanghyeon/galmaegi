@@ -140,10 +140,14 @@
   tr.appendChild(tdButton);
 
   tbody.appendChild(tr);
-}); 
-        </script>
+}); catch (error) {
+      console.error("조회 오류:", error);
+      alert("예약 데이터를 불러오는 중 문제가 발생했습니다.");
+    }
+  });
+</script>
 
-  </script>
+
 </body>
 </html>
 
