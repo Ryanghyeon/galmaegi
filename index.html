@@ -1,10 +1,11 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>갈매기 가든 예약</title>
+
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script>
@@ -12,7 +13,7 @@
       apiKey: "AIzaSyDd7YxnP6TZi9nKKUwGsKxis8YbtnaOd00",
       authDomain: "galmaegi-98b99.firebaseapp.com",
       projectId: "galmaegi-98b99",
-      storageBucket: "galmaegi-98b99.firebasestorage.app",
+      storageBucket: "galmaegi-98b99.appspot.com",
       messagingSenderId: "737602697863",
       appId: "1:737602697863:web:1f38158b28ddfe92d8d622",
       measurementId: "G-XRVV6BDCYN"
@@ -20,107 +21,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
   </script>
-  <script>
-  const maxSeats = {
-    A: 10,
-    B: 8,
-    C: 14,
-    D: 15,
-    G: 10,
-    E: 4,
-    F: 5
-  };
 
-  const reserveBtn = document.getElementById("reserveBtn");
-  reserveBtn.addEventListener("click", async () => {
-    const name = document.getElementById("name").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const date = document.getElementById("date").value;
-    const area = document.getElementById("area").value.trim().toUpperCase();
-
-    if (!name || !phone || !date || !area) {
-      alert("모든 값을 입력해주세요.");
-      return;
-    }
-
-    // 1. 당일 예약 차단
-    const today = new Date();
-    const selectedDate = new Date(date);
-    today.setHours(0, 0, 0, 0);
-    selectedDate.setHours(0, 0, 0, 0);
-
-    if (selectedDate.getTime() <= today.getTime()) {
-      alert("당일 예약은 불가능합니다.");
-      return;
-    }
-
-    // 2. 구역 유효성 검사
-    const zone = area.split("-")[0];
-    if (!maxSeats.hasOwnProperty(zone)) {
-      alert("존재하지 않는 구역입니다. (예: A-1, B-5)");
-      return;
-    }
-
-    // 3. 해당 날짜 + 구역 예약 수 확인
-    try {
-      const snapshot = await db.collection("reservations")
-        .where("date", "==", date)
-        .where("area", ">=", zone + "-")
-        .where("area", "<", zone + "-\uf8ff")
-        .get();
-
-      const reservedCount = snapshot.size;
-      const limit = maxSeats[zone];
-
-      if (reservedCount >= limit) {
-        alert(`${zone}구역은 해당 날짜에 예약이 마감되었습니다.`);
-        return;
-      }
-
-      // 4. 가격 설정
-      let price = 50000;
-      if (zone === "A") price = 60000;
-
-      // 5. 예약 저장
-      await db.collection("reservations").add({
-        name,
-        phone,
-        date,
-        area,
-        zone,
-        price,
-        timestamp: new Date(),
-        status: "대기"
-      });
-
-      alert(
-        `예약이 접수되었습니다!\n구역: ${area}\n금액: ${price.toLocaleString()}원\n` +
-        `무통장입금 계좌: 농협 0105433248609 (예금주: 이진용)`
-      );
-    } catch (error) {
-      console.error("예약 저장 실패:", error);
-      alert("예약 저장 중 오류가 발생했습니다.");
-    }
-     // 평상 가격 계산
-        let price = 50000;
-        if (area.toUpperCase().startsWith("A-")) price = 60000;
-
-        try {
-          await db.collection("reservations").add({
-            name, phone, date, area, price, timestamp: new Date(), status: "대기"
-          });
-
-          alert(
-            `예약이 접수되었습니다!\n구역: ${area}\n금액: ${price.toLocaleString()}원\n` +
-            `무통장입금 계좌: 농협 0105433248609 (예금주: 이진용)`
-          );
-        } catch (error) {
-          console.error("예약 저장 실패:", error);
-          alert("예약 저장 중 오류가 발생했습니다.");
-        }
-      });
-  });
-    </script>
   <style>
     body {
       font-family: sans-serif;
@@ -195,6 +96,7 @@
     <h1>갈매기 가든 예약</h1>
     <p>전북 완주군 운주면 금고당로 366</p>
   </header>
+
   <div class="container">
     <h2>예약하기</h2>
     <label for="name">이름</label>
@@ -203,38 +105,88 @@
     <input type="text" id="phone" placeholder="010-0000-0000" />
     <label for="date">날짜</label>
     <input type="date" id="date" />
-    <h3>평상 구역 선택</h3>
-<div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
-  <button type="button" onclick="selectArea('A')">A구역</button>
-  <button type="button" onclick="selectArea('B')">B구역</button>
-  <button type="button" onclick="selectArea('C')">C구역</button>
-  <button type="button" onclick="selectArea('D')">D구역</button>
-  <button type="button" onclick="selectArea('E')">E구역</button>
-    <button type="button" onclick="selectArea('F')">F구역</button>
-    <button type="button" onclick="selectArea('G')">G구역</button>
-</div>
     <label for="area">평상 구역</label>
-    <input id="area" placeholder="예: A구역 " readonly /><br />
+    <input id="area" placeholder="예: A-1, C-5" />
     <button id="reserveBtn">예약 완료</button>
-    <script>
-  function selectArea(area) {
-    const currentValue = document.getElementById('area').value;
-    if (!currentValue || !/^[ABCD]-\d+$/.test(currentValue)) {
-      document.getElementById('area').value = `${area}-`;
-    } else {
-      document.getElementById('area').value = `${area}-${currentValue.split('-')[1] || ''}`;
-    }
-  }
-</script>
-    <script>
-  function selectArea(area) {
-    document.getElementById('area').value = area + '구역';
-  }
-</script>
- 
 
-    <img src="images/jang.png" alt="배치도" width="100%" style="margin-top: 1rem;" /><br />
+    <script>
+      const reserveBtn = document.getElementById("reserveBtn");
+      reserveBtn.addEventListener("click", async () => {
+        const name = document.getElementById("name").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const date = document.getElementById("date").value;
+        const area = document.getElementById("area").value.trim().toUpperCase();
 
+        if (!name || !phone || !date || !area) {
+          alert("모든 값을 입력해주세요.");
+          return;
+        }
+
+        // 당일 예약 금지
+        const selectedDate = new Date(date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (selectedDate.getTime() <= today.getTime()) {
+          alert("당일 예약은 불가능합니다. 내일 이후 날짜를 선택해주세요.");
+          return;
+        }
+
+        // 구역별 정원 설정
+        const limits = {
+          A: 10, B: 8, C: 14, D: 15, G: 10, E: 4, F: 5
+        };
+
+        const areaPrefix = area.split("-")[0];
+        const maxCapacity = limits[areaPrefix];
+
+        if (!maxCapacity) {
+          alert("유효하지 않은 구역입니다. 예: A-1 또는 C-5");
+          return;
+        }
+
+        try {
+          const snapshot = await db.collection("reservations")
+            .where("date", "==", date)
+            .where("area", ">=", areaPrefix + "-")
+            .where("area", "<", areaPrefix + "-z")
+            .get();
+
+          const reservedCount = snapshot.size;
+
+          if (reservedCount >= maxCapacity) {
+            alert(`해당 날짜의 ${areaPrefix}구역은 이미 정원이 초과되었습니다.`);
+            return;
+          }
+
+          let price = 50000;
+          if (areaPrefix === "A") price = 60000;
+
+          await db.collection("reservations").add({
+            name,
+            phone,
+            date,
+            area,
+            price,
+            status: "대기",
+            timestamp: new Date()
+          });
+
+          alert(
+            `예약이 접수되었습니다!\n구역: ${area}\n금액: ${price.toLocaleString()}원\n` +
+            `무통장입금 계좌: 농협 0105433248609 (예금주: 이진용)`
+          );
+
+        } catch (error) {
+          console.error("예약 저장 실패:", error);
+          alert("예약 저장 중 오류가 발생했습니다.");
+        }
+      });
+    </script>
+
+    <!-- 배치도 이미지 -->
+    <img src="./images/배치도.png" alt="배치도" width="100%" style="margin-top: 1rem;" />
+
+    <!-- 메뉴 이미지 -->
     <h2>📋 메뉴 안내</h2>
     <div class="menu">
       <div class="menu-item">
@@ -263,8 +215,10 @@
       </div>
     </div>
   </div>
+
   <footer>
     갈매기 가든 &copy; 2025. All rights reserved.
   </footer>
 </body>
 </html>
+
