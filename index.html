@@ -101,6 +101,24 @@
       console.error("예약 저장 실패:", error);
       alert("예약 저장 중 오류가 발생했습니다.");
     }
+     // 평상 가격 계산
+        let price = 50000;
+        if (area.toUpperCase().startsWith("A-")) price = 60000;
+
+        try {
+          await db.collection("reservations").add({
+            name, phone, date, area, price, timestamp: new Date(), status: "대기"
+          });
+
+          alert(
+            `예약이 접수되었습니다!\n구역: ${area}\n금액: ${price.toLocaleString()}원\n` +
+            `무통장입금 계좌: 농협 0105433248609 (예금주: 이진용)`
+          );
+        } catch (error) {
+          console.error("예약 저장 실패:", error);
+          alert("예약 저장 중 오류가 발생했습니다.");
+        }
+      });
   });
   <style>
     body {
@@ -212,39 +230,7 @@
     document.getElementById('area').value = area + '구역';
   }
 </script>
-    <script>
-  
-      const reserveBtn = document.getElementById("reserveBtn");
-      reserveBtn.addEventListener("click", async () => {
-        const name = document.getElementById("name").value.trim();
-        const phone = document.getElementById("phone").value.trim();
-        const date = document.getElementById("date").value;
-        const area = document.getElementById("area").value.trim();
-
-        if (!name || !phone || !date || !area) {
-          alert("모든 값을 입력해주세요.");
-          return;
-        }
-
-        // 평상 가격 계산
-        let price = 50000;
-        if (area.toUpperCase().startsWith("A-")) price = 60000;
-
-        try {
-          await db.collection("reservations").add({
-            name, phone, date, area, price, timestamp: new Date(), status: "대기"
-          });
-
-          alert(
-            `예약이 접수되었습니다!\n구역: ${area}\n금액: ${price.toLocaleString()}원\n` +
-            `무통장입금 계좌: 농협 0105433248609 (예금주: 이진용)`
-          );
-        } catch (error) {
-          console.error("예약 저장 실패:", error);
-          alert("예약 저장 중 오류가 발생했습니다.");
-        }
-      });
-    </script>
+ 
 
     <img src="images/jang.png" alt="배치도" width="100%" style="margin-top: 1rem;" /><br />
 
