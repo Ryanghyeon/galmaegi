@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>갈매기 가든 예약</title>
-
-  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script>
@@ -13,7 +11,7 @@
       apiKey: "AIzaSyDd7YxnP6TZi9nKKUwGsKxis8YbtnaOd00",
       authDomain: "galmaegi-98b99.firebaseapp.com",
       projectId: "galmaegi-98b99",
-      storageBucket: "galmaegi-98b99.appspot.com",
+      storageBucket: "galmaegi-98b99.firebasestorage.app",
       messagingSenderId: "737602697863",
       appId: "1:737602697863:web:1f38158b28ddfe92d8d622",
       measurementId: "G-XRVV6BDCYN"
@@ -21,73 +19,66 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
   </script>
-
   <style>
     body {
       font-family: sans-serif;
       margin: 0;
       padding: 0;
-      background-image: url('./images/background.jpg');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      color: #2d2d2d;
+      background-color: #f6f6f6;
     }
     header {
-      background: rgba(255,255,255,0.85);
+      background: #207744;
+      color: white;
       padding: 20px;
       text-align: center;
     }
-    h1 {
-      margin: 0;
-      color: #207744;
-    }
     .container {
-      max-width: 800px;
+      max-width: 700px;
       margin: 20px auto;
-      background: rgba(255,255,255,0.9);
+      background: white;
       padding: 20px;
-      border-radius: 12px;
+      border-radius: 8px;
     }
     label {
       display: block;
       margin-top: 1rem;
     }
-    input {
+    input, select {
       padding: 8px;
       width: 100%;
       margin-top: 4px;
+      box-sizing: border-box;
     }
-    button {
-      margin-top: 1rem;
-      padding: 10px 20px;
-      background: #207744;
+    .area-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .area-buttons button {
+      padding: 10px;
+      border: none;
+      background-color: #e0e0e0;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .area-buttons button:hover {
+      background-color: #ccc;
+    }
+    button.submit {
+      margin-top: 1.5rem;
+      padding: 10px;
+      background-color: #207744;
       color: white;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-    }
-    .menu {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-top: 2rem;
-    }
-    .menu-item {
-      background: #f2f2f2;
-      padding: 10px;
-      border-radius: 8px;
-      text-align: center;
-    }
-    .menu-item img {
-      max-width: 100%;
-      border-radius: 8px;
+      width: 100%;
     }
     footer {
       text-align: center;
-      padding: 1rem;
       font-size: 0.9rem;
-      background: rgba(255,255,255,0.85);
+      padding: 1rem;
     }
   </style>
 </head>
@@ -98,147 +89,102 @@
   </header>
 
   <div class="container">
-    <h2>예약하기</h2>
-    <label for="name">이름</label>
-    <input type="text" id="name" placeholder="예약자 이름" />
-    <label for="phone">연락처</label>
-    <input type="text" id="phone" placeholder="010-0000-0000" />
-    <label for="date">날짜</label>
-    <input type="date" id="date" />
-    <label for="area">평상 구역</label><div style="margin-top: 1rem;">
-  <label>평상 구역 선택</label>
-  <div id="area-buttons" style="display: flex; flex-wrap: wrap; gap: 8px;">
-    <button type="button" class="area-btn" data-area="A">A구역</button>
-    <button type="button" class="area-btn" data-area="B">B구역</button>
-    <button type="button" class="area-btn" data-area="C">C구역</button>
-    <button type="button" class="area-btn" data-area="D">D구역</button>
-    <button type="button" class="area-btn" data-area="E">E구역</button>
-    <button type="button" class="area-btn" data-area="F">F구역</button>
-    <button type="button" class="area-btn" data-area="G">G구역</button>
-  </div>
-</div>
-    <script>
-  document.querySelectorAll('.area-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const area = btn.dataset.area;
-      const input = document.getElementById('area');
-      
-      input.focus();
-    });
-  });
-</script>
-   
+    <h2>예약 신청</h2>
 
-    <input id="area" placeholder="예: A구역" />
-    <button id="reserveBtn">예약 완료</button>
+    <label>이름</label>
+    <input type="text" id="name" placeholder="예약자 이름" />
+
+    <label>연락처</label>
+    <input type="text" id="phone" placeholder="010-0000-0000" />
+
+    <label>예약 날짜</label>
+    <input type="date" id="date" />
+
+    <label>구역 선택</label>
+    <div class="area-buttons">
+      <button type="button" class="area-btn" data-area="A구역">A구역</button>
+      <button type="button" class="area-btn" data-area="B구역">B구역</button>
+      <button type="button" class="area-btn" data-area="C구역">C구역</button>
+      <button type="button" class="area-btn" data-area="D구역">D구역</button>
+      <button type="button" class="area-btn" data-area="E구역">E구역</button>
+      <button type="button" class="area-btn" data-area="F구역">F구역</button>
+      <button type="button" class="area-btn" data-area="G구역">G구역</button>
+    </div>
+
+    <input type="text" id="area" placeholder="선택한 구역" readonly />
+
+    <button class="submit" id="reserveBtn">예약 완료</button>
+  </div>
+
+  <footer>갈매기 가든 &copy; 2025</footer>
 
   <script>
-  const reserveBtn = document.getElementById("reserveBtn");
-  reserveBtn.addEventListener("click", async () => {
-    const name = document.getElementById("name").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const date = document.getElementById("date").value;
-    const area = document.getElementById("area").value.trim().toUpperCase();
+    const areaLimits = {
+      "A구역": 10,
+      "B구역": 8,
+      "C구역": 14,
+      "D구역": 15,
+      "E구역": 4,
+      "F구역": 5,
+      "G구역": 10
+    };
 
-    if (!name || !phone || !date || !area) {
-      alert("모든 값을 입력해주세요.");
-      return;
-    }
+    document.querySelectorAll(".area-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        document.getElementById("area").value = button.dataset.area;
+      });
+    });
 
-    const selectedDate = new Date(date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (selectedDate.getTime() <= today.getTime()) {
-      alert("당일 예약은 불가능합니다. 내일 이후 날짜를 선택해주세요.");
-      return;
-    }
+    document.getElementById("reserveBtn").addEventListener("click", async () => {
+      const name = document.getElementById("name").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const date = document.getElementById("date").value;
+      const area = document.getElementById("area").value;
 
-    const limits = { A: 10, B: 8, C: 14, D: 15, G: 10, E: 4, F: 5 };
-    const areaPrefix = area.split("-")[0];
-    const maxCapacity = limits[areaPrefix];
-
-    if (!maxCapacity) {
-      alert("유효하지 않은 구역입니다. 예: A");
-      return;
-    }
-
-    let price = 50000;
-    if (areaPrefix === "A") price = 60000;
-
-    try {
-      const snapshot = await db.collection("reservations")
-        .where("date", "==", date)
-        .where("area", ">=", areaPrefix + "-")
-        .where("area", "<", areaPrefix + "-z")
-        .get();
-
-      const reservedCount = snapshot.size;
-
-      if (reservedCount >= maxCapacity) {
-        alert(`해당 날짜의 ${areaPrefix}구역은 이미 정원이 초과되었습니다.`);
+      if (!name || !phone || !date || !area) {
+        alert("모든 값을 입력해주세요.");
         return;
       }
 
-      await db.collection("reservations").add({
-        name,
-        phone,
-        date,
-        area,
-        price,
-        status: "대기",
-        timestamp: new Date()
-      });
+      // 당일 예약 불가
+      const today = new Date();
+      const selectedDate = new Date(date);
+      if (selectedDate.toDateString() === today.toDateString()) {
+        alert("당일 예약은 불가능합니다. 다른 날짜를 선택해주세요.");
+        return;
+      }
 
-    } catch (error) {
-      console.error("예약 저장 실패:", error);
-      alert("예약 저장 중 오류가 발생했습니다.");
-      return;
-    }
+      // 정원 체크
+      try {
+        const snapshot = await db.collection("reservations")
+          .where("date", "==", date)
+          .where("area", "==", area)
+          .get();
 
-    // ✅ 성공 알림은 try 외부에 두면 무조건 실행됨
-    alert(
-      `예약이 접수되었습니다!\n구역: ${area}\n금액: ${price.toLocaleString()}원\n` +
-      `무통장입금 계좌: 농협 0105433248609 (예금주: 이진용)`
-    );
-  });
-</script>
+        const count = snapshot.size;
+        const max = areaLimits[area];
 
-    <!-- 배치도 이미지 -->
-    <img src="./images/jang.png" alt="배치도" width="100%" style="margin-top: 1rem;" />
+        if (count >= max) {
+          alert(`${area}의 정원(${max}명)을 초과했습니다. 다른 구역을 선택해주세요.`);
+          return;
+        }
 
-    <!-- 메뉴 이미지 -->
-    <h2>📋 메뉴 안내</h2>
-    <div class="menu">
-      <div class="menu-item">
-        <img src="./images/a1.png" alt="닭백숙" />
-        <p>닭백숙 - 7만원</p>
-      </div>
-      <div class="menu-item">
-        <img src="./images/a2.png" alt="닭도리탕" />
-        <p>닭도리탕 - 7만원</p>
-      </div>
-      <div class="menu-item">
-        <img src="./images/a3.png" alt="옻닭" />
-        <p>옻닭 - 7만5천원</p>
-      </div>
-      <div class="menu-item">
-        <img src="./images/a4.png" alt="묵은지 닭도리탕" />
-        <p>묵은지 닭도리탕 - 7만5천원</p>
-      </div>
-      <div class="menu-item">
-        <img src="./images/a5.png" alt="삼겹살" />
-        <p>삼겹살 (200g) - 2만원</p>
-      </div>
-      <div class="menu-item">
-        <img src="./images/a6.jpg" alt="오리주물럭" />
-        <p>오리주물럭 - 8만원</p>
-      </div>
-    </div>
-  </div>
+        await db.collection("reservations").add({
+          name,
+          phone,
+          date,
+          area,
+          timestamp: new Date(),
+          status: "대기"
+        });
 
-  <footer>
-    갈매기 가든 &copy; 2025. All rights reserved.
-  </footer>
+        alert("예약이 접수되었습니다.\n무통장입금 계좌: 농협 0105433248609 (이진용)");
+
+      } catch (error) {
+        console.error("예약 오류:", error);
+        alert("예약 저장 중 문제가 발생했습니다.");
+      }
+    });
+  </script>
 </body>
 </html>
-
