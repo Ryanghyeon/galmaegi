@@ -110,10 +110,9 @@
   <button type="button" onclick="selectArea('D')">D구역</button>
 </div>
     <label for="area">평상 구역</label>
-    <input id="area" placeholder="예: A구역 " /><br />
+    <input id="area" placeholder="예: A구역 " readonly /><br />
     <button id="reserveBtn">예약 완료</button>
     <script>
-      <script>
   function selectArea(area) {
     const currentValue = document.getElementById('area').value;
     if (!currentValue || !/^[ABCD]-\d+$/.test(currentValue)) {
@@ -123,6 +122,13 @@
     }
   }
 </script>
+    <script>
+  function selectArea(area) {
+    document.getElementById('area').value = area + '구역';
+  }
+</script>
+    <script>
+  
       const reserveBtn = document.getElementById("reserveBtn");
       reserveBtn.addEventListener("click", async () => {
         const name = document.getElementById("name").value.trim();
