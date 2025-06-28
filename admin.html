@@ -62,7 +62,9 @@
 </head>
 <body>
   <h1>예약 관리 (갈매기 가든)</h1>
- <label for="date">날짜 선택:</label>
+ 
+  
+  <label for="date">날짜 선택:</label>
   <input type="date" id="date" />
 
   <table id="reservationTable" style="display: none;">
@@ -79,6 +81,7 @@
   </table>
 
   <script>
+
     document.getElementById("date").addEventListener("change", async () => {
       const date = document.getElementById("date").value;
       const tbody = document.querySelector("#reservationTable tbody");
@@ -87,6 +90,7 @@
       if (!date) return;
 
       try {
+        const selectedDate = document.getElementById("date").value;
         const snapshot = await db.collection("reservations")
           .where("date", "==", date)
           .orderBy("timestamp", "asc")
@@ -113,7 +117,8 @@
 
         document.getElementById("reservationTable").style.display = "table";
 
-      } catch (error) {
+      } 
+      catch (error) {
         console.error("조회 오류:", error);
         alert("예약 데이터를 불러오는 중 문제가 발생했습니다.");
       }
