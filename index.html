@@ -2,24 +2,24 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyDd7YxnP6TZi9nKKUwGsKxis8YbtnaOd00",
-  authDomain: "galmaegi-98b99.firebaseapp.com",
-  projectId: "galmaegi-98b99",
-  storageBucket: "galmaegi-98b99.firebasestorage.app",
-  messagingSenderId: "737602697863",
-  appId: "1:737602697863:web:1f38158b28ddfe92d8d622",
-  measurementId: "G-XRVV6BDCYN"
-};
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>갈매기 가든 예약</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDd7YxnP6TZi9nKKUwGsKxis8YbtnaOd00",
+      authDomain: "galmaegi-98b99.firebaseapp.com",
+      projectId: "galmaegi-98b99",
+      storageBucket: "galmaegi-98b99.firebasestorage.app",
+      messagingSenderId: "737602697863",
+      appId: "1:737602697863:web:1f38158b28ddfe92d8d622",
+      measurementId: "G-XRVV6BDCYN"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
   <style>
     body {
       font-family: sans-serif;
@@ -92,7 +92,7 @@ const firebaseConfig = {
 <body>
   <header>
     <h1>갈매기 가든 예약</h1>
-    <p>전북 완주군 운주면 366</p>
+    <p>전북 완주군 운주면 금고당로 366</p>
   </header>
   <div class="container">
     <h2>예약하기</h2>
@@ -102,32 +102,43 @@ const firebaseConfig = {
     <input type="text" id="phone" placeholder="010-0000-0000" />
     <label for="date">날짜</label>
     <input type="date" id="date" />
-    <button onclick="alert('예약이 접수되었습니다!')">예약 완료
-    </button>
-      <script>
-  const reserveBtn = document.querySelector("button");
-  reserveBtn.addEventListener("click", async () => {
-    const name = document.getElementById("name").value;
-    const phone = document.getElementById("phone").value;
-    const date = document.getElementById("date").value;
+    <label for="area">평상 구역</label>
+    <input id="area" placeholder="예: A-12 또는 C-5" /><br />
+    <button id="reserveBtn">예약 완료</button>
+    <script>
+      const reserveBtn = document.getElementById("reserveBtn");
+      reserveBtn.addEventListener("click", async () => {
+        const name = document.getElementById("name").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const date = document.getElementById("date").value;
+        const area = document.getElementById("area").value.trim();
 
-    if (!name || !phone || !date) {
-      alert("모든 값을 입력해주세요.");
-      return;
-    }
+        if (!name || !phone || !date || !area) {
+          alert("모든 값을 입력해주세요.");
+          return;
+        }
 
-    try {
-      await db.collection("reservations").add({
-        name, phone, date, timestamp: new Date()
+        // 평상 가격 계산
+        let price = 50000;
+        if (area.toUpperCase().startsWith("A-")) price = 60000;
+
+        try {
+          await db.collection("reservations").add({
+            name, phone, date, area, price, timestamp: new Date(), status: "대기"
+          });
+
+          alert(
+            `예약이 접수되었습니다!\n구역: ${area}\n금액: ${price.toLocaleString()}원\n` +
+            `무통장입금 계좌: 농협 0105433248609 (예금주: 이진용)`
+          );
+        } catch (error) {
+          console.error("예약 저장 실패:", error);
+          alert("예약 저장 중 오류가 발생했습니다.");
+        }
       });
-      alert("예약이 접수되었습니다!");
-    } catch (error) {
-      console.error("예약 저장 실패:", error);
-      alert("예약 저장 중 오류가 발생했습니다.");
-    }
-  });
-</script>
+    </script>
 
+    <img src="images/batch_map.jpg" alt="배치도" width="100%" style="margin-top: 1rem;" /><br />
 
     <h2>📋 메뉴 안내</h2>
     <div class="menu">
@@ -150,6 +161,10 @@ const firebaseConfig = {
       <div class="menu-item">
         <img src="./images/samgyeopsal.jpg" alt="삼겹살" />
         <p>삼겹살 (200g) - 2만원</p>
+      </div>
+      <div class="menu-item">
+        <img src="./images/ori.jpg" alt="오리주물럭" />
+        <p>오리주물럭 - 8만원</p>
       </div>
     </div>
   </div>
