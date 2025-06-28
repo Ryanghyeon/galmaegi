@@ -169,6 +169,7 @@
           alert(`${area}의 정원(${max}명)을 초과했습니다. 다른 구역을 선택해주세요.`);
           return;
         }
+         const price = area === "A구역" ? 60000 : 50000;
 
         await db.collection("reservations").add({
           name,
