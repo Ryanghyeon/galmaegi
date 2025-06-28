@@ -119,75 +119,79 @@
 
   <footer>갈매기 가든 &copy; 2025</footer>
 
-  <script>
-    const areaLimits = {
-      "A구역": 10,
-      "B구역": 8,
-      "C구역": 14,
-      "D구역": 15,
-      "E구역": 4,
-      "F구역": 5,
-      "G구역": 10
-    };
+ <script>
+  const areaLimits = {
+    "A구역": 10,
+    "B구역": 8,
+    "C구역": 14,
+    "D구역": 15,
+    "E구역": 4,
+    "F구역": 5,
+    "G구역": 10
+  };
 
-    document.querySelectorAll(".area-btn").forEach(button => {
-      button.addEventListener("click", () => {
-        document.getElementById("area").value = button.dataset.area;
+  document.querySelectorAll(".area-btn").forEach(button => {
+    button.addEventListener("click", () => {
+      document.getElementById("area").value = button.dataset.area;
+    });
+  });
+
+  document.getElementById("reserveBtn").addEventListener("click", async () => {
+    const name = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const date = document.getElementById("date").value;
+    const area = document.getElementById("area").value;
+
+    if (!name || !phone || !date || !area) {
+      alert("모든 값을 입력해주세요.");
+      return;
+    }
+
+    // 당일 예약 불가
+    const today = new Date();
+    const selectedDate = new Date(date);
+    if (selectedDate.toDateString() === today.toDateString()) {
+      alert("당일 예약은 불가능합니다. 다른 날짜를 선택해주세요.");
+      return;
+    }
+
+    // 정원 체크
+    try {
+      const snapshot = await db.collection("reservations")
+        .where("date", "==", date)
+        .where("area", "==", area)
+        .get();
+
+      const count = snapshot.size;
+      const max = areaLimits[area];
+
+      if (count >= max) {
+        alert(`${area}의 정원(${max}명)을 초과했습니다. 다른 구역을 선택해주세요.`);
+        return;
+      }
+
+      // 가격 설정
+      const price = area === "A구역" ? 60000 : 50000;
+
+      await db.collection("reservations").add({
+        name,
+        phone,
+        date,
+        area,
+        price,
+        timestamp: new Date(),
+        status: "대기"
       });
-    });
 
-    document.getElementById("reserveBtn").addEventListener("click", async () => {
-      const name = document.getElementById("name").value.trim();
-      const phone = document.getElementById("phone").value.trim();
-      const date = document.getElementById("date").value;
-      const area = document.getElementById("area").value;
+      alert(`예약이 접수되었습니다.\n금액: ${price.toLocaleString()}원\n무통장입금 계좌: 농협 0105433248609 (이진용)`);
 
-      if (!name || !phone || !date || !area) {
-        alert("모든 값을 입력해주세요.");
-        return;
-      }
-
-      // 당일 예약 불가
-      const today = new Date();
-      const selectedDate = new Date(date);
-      if (selectedDate.toDateString() === today.toDateString()) {
-        alert("당일 예약은 불가능합니다. 다른 날짜를 선택해주세요.");
-        return;
-      }
-
-      // 정원 체크
-      try {
-        const snapshot = await db.collection("reservations")
-          .where("date", "==", date)
-          .where("area", "==", area)
-          .get();
-
-        const count = snapshot.size;
-        const max = areaLimits[area];
-
-        if (count >= max) {
-          alert(`${area}의 정원(${max}명)을 초과했습니다. 다른 구역을 선택해주세요.`);
-          return;
-        }
-         const price = area === "A구역" ? 60000 : 50000;
-
-        await db.collection("reservations").add({
-          name,
-          phone,
-          date,
-          area,
-          timestamp: new Date(),
-          status: "대기"
-        });
-
-       alert(`예약이 접수되었습니다.\n금액: ${price.toLocaleString()}원\n무통장입금 계좌: 농협 0105433248609 (이진용)`);
-
-      } catch (error) {
-        console.error("예약 오류:", error);
-        alert("예약 저장 중 문제가 발생했습니다.");
-      }
-    });
-  </script><style>
+    } catch (error) {
+      console.error("예약 오류:", error);
+      alert("예약 저장 중 문제가 발생했습니다.");
+    }
+  });
+</script>
+  <style>
     body {
       font-family: sans-serif;
       margin: 0;
