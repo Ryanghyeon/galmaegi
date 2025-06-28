@@ -109,79 +109,76 @@
     <input id="area" placeholder="예: A-1, C-5" />
     <button id="reserveBtn">예약 완료</button>
 
-    <script>
-      const reserveBtn = document.getElementById("reserveBtn");
-      reserveBtn.addEventListener("click", async () => {
-        const name = document.getElementById("name").value.trim();
-        const phone = document.getElementById("phone").value.trim();
-        const date = document.getElementById("date").value;
-        const area = document.getElementById("area").value.trim().toUpperCase();
+  <script>
+  const reserveBtn = document.getElementById("reserveBtn");
+  reserveBtn.addEventListener("click", async () => {
+    const name = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const date = document.getElementById("date").value;
+    const area = document.getElementById("area").value.trim().toUpperCase();
 
-        if (!name || !phone || !date || !area) {
-          alert("모든 값을 입력해주세요.");
-          return;
-        }
+    if (!name || !phone || !date || !area) {
+      alert("모든 값을 입력해주세요.");
+      return;
+    }
 
-        // 당일 예약 금지
-        const selectedDate = new Date(date);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        if (selectedDate.getTime() <= today.getTime()) {
-          alert("당일 예약은 불가능합니다. 내일 이후 날짜를 선택해주세요.");
-          return;
-        }
+    const selectedDate = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (selectedDate.getTime() <= today.getTime()) {
+      alert("당일 예약은 불가능합니다. 내일 이후 날짜를 선택해주세요.");
+      return;
+    }
 
-        // 구역별 정원 설정
-        const limits = {
-          A: 10, B: 8, C: 14, D: 15, G: 10, E: 4, F: 5
-        };
+    const limits = { A: 10, B: 8, C: 14, D: 15, G: 10, E: 4, F: 5 };
+    const areaPrefix = area.split("-")[0];
+    const maxCapacity = limits[areaPrefix];
 
-        const areaPrefix = area.split("-")[0];
-        const maxCapacity = limits[areaPrefix];
+    if (!maxCapacity) {
+      alert("유효하지 않은 구역입니다. 예: A-1 또는 C-5");
+      return;
+    }
 
-        if (!maxCapacity) {
-          alert("유효하지 않은 구역입니다. 예: A-1 또는 C-5");
-          return;
-        }
+    let price = 50000;
+    if (areaPrefix === "A") price = 60000;
 
-        try {
-          const snapshot = await db.collection("reservations")
-            .where("date", "==", date)
-            .where("area", ">=", areaPrefix + "-")
-            .where("area", "<", areaPrefix + "-z")
-            .get();
+    try {
+      const snapshot = await db.collection("reservations")
+        .where("date", "==", date)
+        .where("area", ">=", areaPrefix + "-")
+        .where("area", "<", areaPrefix + "-z")
+        .get();
 
-          const reservedCount = snapshot.size;
+      const reservedCount = snapshot.size;
 
-          if (reservedCount >= maxCapacity) {
-            alert(`해당 날짜의 ${areaPrefix}구역은 이미 정원이 초과되었습니다.`);
-            return;
-          }
+      if (reservedCount >= maxCapacity) {
+        alert(`해당 날짜의 ${areaPrefix}구역은 이미 정원이 초과되었습니다.`);
+        return;
+      }
 
-          let price = 50000;
-          if (areaPrefix === "A") price = 60000;
-
-          await db.collection("reservations").add({
-            name,
-            phone,
-            date,
-            area,
-            price,
-            status: "대기",
-            timestamp: new Date()
-          });
-
-          alert(
-            `예약이 접수되었습니다!\n구역: ${area}\n금액: ${price.toLocaleString()}원\n` +
-            `무통장입금 계좌: 농협 0105433248609 (예금주: 이진용)`
-          );
-
-        } catch (error) {
-          console.error("예약 저장 실패:", error);
-          alert("예약 저장 중 오류가 발생했습니다.");
-        }
+      await db.collection("reservations").add({
+        name,
+        phone,
+        date,
+        area,
+        price,
+        status: "대기",
+        timestamp: new Date()
       });
-    </script>
+
+    } catch (error) {
+      console.error("예약 저장 실패:", error);
+      alert("예약 저장 중 오류가 발생했습니다.");
+      return;
+    }
+
+    // ✅ 성공 알림은 try 외부에 두면 무조건 실행됨
+    alert(
+      `예약이 접수되었습니다!\n구역: ${area}\n금액: ${price.toLocaleString()}원\n` +
+      `무통장입금 계좌: 농협 0105433248609 (예금주: 이진용)`
+    );
+  });
+</script>
 
     <!-- 배치도 이미지 -->
     <img src="./images/배치도.png" alt="배치도" width="100%" style="margin-top: 1rem;" />
