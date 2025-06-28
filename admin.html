@@ -30,41 +30,38 @@
       text-align: center;
       color: #207744;
     }
-    .reservation {
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
       background: white;
-      border: 1px solid #ccc;
-      padding: 15px;
-      margin: 10px auto;
-      max-width: 600px;
-      border-radius: 10px;
     }
-    .reservation p {
-      margin: 5px 0;
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background: #e6f2ed;
     }
     .confirm-button {
       background: #207744;
       color: white;
       border: none;
       padding: 6px 12px;
-      margin-top: 10px;
       cursor: pointer;
       border-radius: 5px;
     }
-    .confirmed {
-      color: green;
-      font-weight: bold;
-    }
-    .waiting {
-      color: red;
-      font-weight: bold;
+    .confirm-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
     }
   </style>
 </head>
 <body>
   <h1>예약 관리 (갈매기 가든)</h1>
- 
-  
-  <label for="date">날짜 선택:</label>
+
+  <label for="date">📅 날짜 선택:</label>
   <input type="date" id="date" />
 
   <table id="reservationTable" style="display: none;">
@@ -75,14 +72,13 @@
         <th>구역</th>
         <th>금액</th>
         <th>상태</th>
-         <th>확인</th>
+        <th>확인</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
 
   <script>
-
     document.getElementById("date").addEventListener("change", async () => {
       const date = document.getElementById("date").value;
       const tbody = document.querySelector("#reservationTable tbody");
@@ -91,7 +87,6 @@
       if (!date) return;
 
       try {
-        const selectedDate = document.getElementById("date").value;
         const snapshot = await db.collection("reservations")
           .where("date", "==", date)
           .orderBy("timestamp", "asc")
@@ -104,50 +99,52 @@
         }
 
         snapshot.forEach(doc => {
-         
-  const data = doc.data();
-  const tr = document.createElement("tr");
+          const data = doc.data();
+          const tr = document.createElement("tr");
 
-  const confirmButton = document.createElement("button");
-  confirmButton.textContent = "예약 확인";
-  confirmButton.className = "confirm-button";
-  confirmButton.disabled = data.status === "확정"; // 이미 확정이면 비활성화
+          const confirmButton = document.createElement("button");
+          confirmButton.textContent = data.status === "확정" ? "확정됨" : "예약 확인";
+          confirmButton.className = "confirm-button";
+          confirmButton.disabled = data.status === "확정";
 
-  confirmButton.addEventListener("click", async () => {
-    try {
-      await db.collection("reservations").doc(doc.id).update({
-        status: "확정"
-      });
-      alert("예약이 확정되었습니다.");
-      confirmButton.disabled = true;
-      confirmButton.textContent = "확정됨";
-    } catch (error) {
-      console.error("확정 실패:", error);
-      alert("예약 확정 중 문제가 발생했습니다.");
-    }
-  });
+          confirmButton.addEventListener("click", async () => {
+            try {
+              await db.collection("reservations").doc(doc.id).update({
+                status: "확정"
+              });
+              alert("예약이 확정되었습니다.");
+              confirmButton.disabled = true;
+              confirmButton.textContent = "확정됨";
+              tr.cells[4].textContent = "확정";
+            } catch (error) {
+              console.error("확정 실패:", error);
+              alert("예약 확정 중 문제가 발생했습니다.");
+            }
+          });
 
-  const tdButton = document.createElement("td");
-  tdButton.appendChild(confirmButton);
+          const tdButton = document.createElement("td");
+          tdButton.appendChild(confirmButton);
 
-  tr.innerHTML = `
-    <td>${data.name}</td>
-    <td>${data.phone}</td>
-    <td>${data.area}</td>
-    <td>${data.price ? data.price.toLocaleString() + "원" : "-"}</td>
-    <td>${data.status || "대기"}</td>
-  `;
-  tr.appendChild(tdButton);
+          tr.innerHTML = `
+            <td>${data.name}</td>
+            <td>${data.phone}</td>
+            <td>${data.area}</td>
+            <td>${data.price ? data.price.toLocaleString() + "원" : "-"}</td>
+            <td>${data.status || "대기"}</td>
+          `;
+          tr.appendChild(tdButton);
 
-  tbody.appendChild(tr);
-}); catch (error) {
-      console.error("조회 오류:", error);
-      alert("예약 데이터를 불러오는 중 문제가 발생했습니다.");
-    }
-  });
-</script>
+          tbody.appendChild(tr);
+        });
 
+        document.getElementById("reservationTable").style.display = "table";
 
+      } catch (error) {
+        console.error("조회 오류:", error);
+        alert("예약 데이터를 불러오는 중 문제가 발생했습니다.");
+      }
+    });
+  </script>
 </body>
 </html>
 
